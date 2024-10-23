@@ -7,9 +7,9 @@ body{
 }
 .videos{
     display: flex;
+    width: 100%;
 }
 video, canvas {
-    display: block;
     width: 100%;
     max-width: 600px;
     height: auto;
