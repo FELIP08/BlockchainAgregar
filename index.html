@@ -1,82 +1,75 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lector de QR</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        video, canvas {
-            display: block;
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-        }
-    </style>
+    <title>Ingresar Estudiantes</title>
+    <link rel="stylesheet" href="style2.css">
 </head>
 <body>
+    <header>
+        <div class="text">
+            <a href="añadir.html">
+            <h1>Blockchain Estudiantes</h1>
+            </a>
+        </div>
+    </header>
+    <div class="main">
+        <h1>Ingresar Estudiantes</h1>
+        <div class="container">
+            <video id="video" autoplay></video>
+            <canvas id="canvas" hidden></canvas>
+            <h2 id="apuntar">Apunta la cámara al código QR</h2>
+            <output><h3> <span id="data"></span></h3></output>
+            <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+            <script>
+                const video = document.getElementById("video");
+                const canvas = document.getElementById("canvas");
+                const canvasContext = canvas.getContext("2d");
+                const outputMessage = document.getElementById("apuntar");
+                const outputData = document.getElementById("data");
 
-<video id="video" autoplay></video>
-<canvas id="canvas" hidden></canvas>
-<p id="outputMessage">Apunta la cámara al código QR</p>
-<p><strong>Resultado:</strong> <span id="outputData"></span></p>
-
-<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
-<script>
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    const canvasContext = canvas.getContext("2d");
-    const outputMessage = document.getElementById("outputMessage");
-    const outputData = document.getElementById("outputData");
-
-    // Acceder a la cámara del usuario
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-    .then(function(stream) {
-        video.srcObject = stream;
-        video.setAttribute("playsinline", true); // para evitar que el video haga fullscreen en algunos dispositivos móviles
-        requestAnimationFrame(tick);
-    });
-    async function addBlock(nt) {
-            const data = nt; /// Mensaje QR
-            await fetch(`http://localhost:3000/addBlock/${data}`);
-            fetchBlockchain();
-    }
-    async function sleep(milliseconds) {
-        const date = Date.now();
-        let currentDate = null;
-        do {
-            currentDate = Date.now();
-        } while (currentDate - date < milliseconds);
-    }
-    function tick() {
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-            const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-
-            if (qrCode) {
-                outputMessage.hidden = true;
-                outputData.innerText = qrCode.data;
-                addBlock(qrCode.data);
-                sleep(2000);
-            } else {
-                outputMessage.hidden = false;
-                outputData.innerText = "";
-            }
-        }
-        requestAnimationFrame(tick);
-    }
-</script>
-
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true);
+                    requestAnimationFrame(tick);
+                });
+                async function addBlock(nt) {
+                        const data = nt;
+                        await fetch(`http://localhost:3000/addBlock/${data}`);
+                        fetchBlockchain();
+                }
+                async function sleep(milliseconds) {
+                    const date = Date.now();
+                    let currentDate = null;
+                    do {
+                        currentDate = Date.now();
+                    } while (currentDate - date < milliseconds);
+                }
+                function tick() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+                        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                        const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+            
+                        if (qrCode) {
+                            outputMessage.hidden = true;
+                            outputData.innerText = qrCode.data;
+                            addBlock(qrCode.data);
+                            sleep(2000);
+                        } else {
+                            outputMessage.hidden = false;
+                            outputData.innerText = "";
+                        }
+                    }
+                    requestAnimationFrame(tick);
+                }
+            </script>
+        </div>
+    </div>
 </body>
 </html>
